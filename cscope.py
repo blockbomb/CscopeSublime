@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 import string
+import re
 
 CSCOPE_PLUGIN_DIR = os.path.basename(os.path.dirname(os.path.realpath(__file__)))
 CSCOPE_SYNTAX_FILE = "Packages/" + CSCOPE_PLUGIN_DIR + "/Lookup Results.hidden-tmLanguage"
@@ -170,13 +171,20 @@ class CscopeCommand(sublime_plugin.TextCommand):
     # switch statement for the different formatted output
     # of Cscope's matches.
     def _append_match_string(self, match, command_mode):
-        default = "{0}".format(match["file"])
+        default = "{0}".format(re.sub('(?i)' + re.escape(self.root), '.', match["file"]))
         if command_mode == 0:
-            return "{0}:{1} - {2} - {3}".format(match["file"].replace(self.root, "."), match["line"], match["scope"], match["instance"])
+            return "{0}:{1} - {2} - {3}".format(re.sub('(?i)' + re.escape(self.root), '.', match["file"])
+                , match["line"], match["scope"]
+                , match["instance"])
         elif command_mode == 1:
-            return "{0}:{1} - {2}".format(match["file"].replace(self.root, "."), match["line"], match["instance"])
+            return "{0}:{1} - {2}".format(re.sub('(?i)' + re.escape(self.root), '.', match["file"])
+                , match["line"]
+                , match["instance"])
         elif command_mode == 2 or command_mode == 3:
-            return "{0}:{1} - {2} - {3}".format(match["file"].replace(self.root, "."), match["line"], match["function"], match["instance"])
+            return "{0}:{1} - {2} - {3}".format(re.sub('(?i)' + re.escape(self.root), '.', match["file"])
+                , match["line"]
+                , match["function"]
+                , match["instance"])
         else:
             return default
 
